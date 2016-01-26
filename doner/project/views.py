@@ -14,9 +14,17 @@ from .access_control_views import (
 from .models import Project, Ticket, Log
 
 
-class ProjectList(ListView):
+class ProjectList(ListView, LoginRequiredView):
 
     model = Project
+
+    def get_queryset(self):
+        if self.request.user.is_superuser:
+            queryset = self.model.objects.all()
+        else:
+            queryset = self.request.user.projects.all()
+
+        return queryset
 
 
 class ProjectCreate(SuperUserView, CreateView):
